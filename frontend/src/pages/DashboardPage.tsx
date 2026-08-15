@@ -98,3 +98,36 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {isLoading ? (
+        <div className="text-ink-500 text-sm">Loading your documents…</div>
+      ) : (
+        <>
+          {data && data.pinned.length > 0 && (
+            <Section title="Pinned documents" docs={data.pinned} />
+          )}
+          {data && data.favorites.length > 0 && (
+            <Section title="Favorites" docs={data.favorites} />
+          )}
+          <Section title="Recent documents" docs={data?.recent || []} />
+        </>
+      )}
+    </div>
+  );
+}
+
+function Section({ title, docs }: { title: string; docs: DocSummary[] }) {
+  return (
+    <div>
+      <h2 className="font-display font-semibold mb-3">{title}</h2>
+      {docs.length === 0 ? (
+        <div className="text-ink-700 text-sm glass-card p-6 text-center">Nothing here yet.</div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {docs.map((doc) => (
+            <DocumentCard key={doc._id} doc={doc} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
