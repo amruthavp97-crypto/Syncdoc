@@ -6,7 +6,12 @@ import { useAppSelector } from "@/app/hooks";
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "/";
 
-const PRESENCE_COLORS = ["#7c5cff", "#3e7bfa", "#4fd0e8", "#3ddc97", "#f7b955", "#ff6b6b"];
+// Collaborator cursor/avatar colors. Kept as a distinct multi-hue set on
+// purpose (see reasoning above) - functional differentiation between
+// people matters more here than staying strictly on-palette. Deepened to
+// solid 600/700-weight tones so white initials/cursor labels stay legible
+// on top of them and the dots read clearly against a light page.
+const PRESENCE_COLORS = ["#b33a3a", "#c9752e", "#40916c", "#2f6690", "#7c5e99", "#c9a227"];
 function colorFor(userId: string) {
   let hash = 0;
   for (const ch of userId) hash = (hash * 31 + ch.charCodeAt(0)) % PRESENCE_COLORS.length;

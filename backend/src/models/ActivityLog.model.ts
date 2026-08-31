@@ -6,6 +6,7 @@ export type ActivityAction =
   | "document.deleted"
   | "document.shared"
   | "workspace.created"
+  | "workspace.deleted"
   | "workspace.member_invited"
   | "workspace.member_removed"
   | "user.login"

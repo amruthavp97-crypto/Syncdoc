@@ -11,6 +11,7 @@ import documentRoutes from "./routes/document.routes";
 import workspaceRoutes from "./routes/workspace.routes";
 import miscRoutes from "./routes/misc.routes";
 import searchRoutes from "./routes/search.routes";
+import folderRoutes from "./routes/folder.routes";
 
 const LOCALHOST_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
@@ -43,6 +44,7 @@ export function createApp(): Express {
   app.use("/api/auth", authRoutes);
   app.use("/api/documents", documentRoutes);
   app.use("/api/workspaces", workspaceRoutes);
+  app.use("/api/folders", folderRoutes);
   app.use("/api/search", searchRoutes);
   app.use("/api", miscRoutes); // /users, /notifications, /dashboard, /admin
 

@@ -1,9 +1,8 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuthBootstrap } from "@/hooks/useAuthBootstrap";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
 
-import LandingPage from "@/pages/LandingPage";
 import LoginPage from "@/pages/auth/LoginPage";
 import RegisterPage from "@/pages/auth/RegisterPage";
 import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
@@ -23,8 +22,8 @@ export default function App() {
 
   return (
     <Routes>
-      {/* Public */}
-      <Route path="/" element={<LandingPage />} />
+      {/* No landing page - root goes straight to login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -37,8 +36,6 @@ export default function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
           <Route path="/documents/:id" element={<DocumentEditorPage />} />
-          <Route path="/favorites" element={<DocumentsPage />} />
-          <Route path="/trash" element={<DocumentsPage />} />
           <Route path="/workspaces" element={<WorkspacesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />

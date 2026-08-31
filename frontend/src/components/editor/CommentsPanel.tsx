@@ -44,7 +44,7 @@ export default function CommentsPanel({ documentId }: { documentId: string }) {
       <div className="space-y-3 max-h-96 overflow-y-auto mb-4">
         {(data || []).length === 0 && <p className="text-sm text-ink-700">No comments yet.</p>}
         {data?.map((c) => (
-          <div key={c._id} className={`p-3 rounded-lg bg-white/[0.03] ${c.resolved ? "opacity-50" : ""}`}>
+          <div key={c._id} className={`p-3 rounded-lg bg-black/[0.025] ${c.resolved ? "opacity-50" : ""}`}>
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-medium">{c.author?.name || "Unknown"}</span>
               <span className="text-[10px] text-ink-700">{formatDistanceToNow(c.createdAt)}</span>

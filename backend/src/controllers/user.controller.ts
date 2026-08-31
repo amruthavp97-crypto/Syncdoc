@@ -12,13 +12,26 @@ export const updateProfile = catchAsync(async (req: Request, res: Response) => {
   for (const key of allowed) {
     if (req.body[key] !== undefined) updates[key] = req.body[key];
   }
-  const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true });
+
+  // Preferences use dot-notation $set on the specific sub-field rather than
+  // replacing the whole `preferences` object - this correctly creates the
+  // field on user documents saved before it existed in the schema (a plain
+  // object assignment would technically still work here, but dot-notation
+  // is the defensively-correct pattern for partial nested updates and
+  // avoids ever accidentally clobbering sibling preference fields added
+  // later).
+  if (req.body.preferences?.emailNotifications !== undefined) {
+    updates["preferences.emailNotifications"] = req.body.preferences.emailNotifications;
+  }
+
+  const user = await User.findByIdAndUpdate(req.user.id, { $set: updates }, { new: true });
+  if (!user) throw ApiError.notFound("User not found");
   res.json({ user });
 });
 
 export const getProfile = catchAsync(async (req: Request, res: Response) => {
   const user = await User.findById(req.params.id).select(
-    "name email avatarUrl bannerUrl bio skills country timezone socialLinks createdAt"
+    "name email avatarUrl bannerUrl bio skills country timezone socialLinks preferences createdAt"
   );
   if (!user) throw ApiError.notFound("User not found");
 

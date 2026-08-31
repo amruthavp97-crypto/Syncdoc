@@ -37,7 +37,7 @@ export default function RegisterPage() {
   if (success) {
     return (
       <AuthShell title="Check your inbox" subtitle="We sent a verification link to your email.">
-        <p className="text-sm text-ink-500">Redirecting you to sign in…</p>
+        <p className="text-sm text-neo-smoke">Redirecting you to sign in…</p>
       </AuthShell>
     );
   }
@@ -64,7 +64,7 @@ export default function RegisterPage() {
         <div>
           <input
             placeholder="Full name"
-            className="input-field"
+            className="neo-input"
             {...register("name", { required: "Name is required", minLength: { value: 2, message: "Too short" } })}
           />
           {errors.name && <p className="text-accent-danger text-xs mt-1">{errors.name.message}</p>}
@@ -73,7 +73,7 @@ export default function RegisterPage() {
           <input
             type="email"
             placeholder="Email address"
-            className="input-field"
+            className="neo-input"
             {...register("email", { required: "Email is required" })}
           />
           {errors.email && <p className="text-accent-danger text-xs mt-1">{errors.email.message}</p>}
@@ -82,7 +82,7 @@ export default function RegisterPage() {
           <input
             type="password"
             placeholder="Password"
-            className="input-field"
+            className="neo-input"
             {...register("password", {
               required: "Password is required",
               minLength: { value: 8, message: "At least 8 characters" },
@@ -94,7 +94,7 @@ export default function RegisterPage() {
           <input
             type="password"
             placeholder="Confirm password"
-            className="input-field"
+            className="neo-input"
             {...register("confirmPassword", {
               validate: (v) => v === watch("password") || "Passwords don't match",
             })}
@@ -106,11 +106,11 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={registerMutation.isPending}
-          className="btn-gradient w-full disabled:opacity-60"
+          className="neo-btn-primary w-full"
         >
           {registerMutation.isPending ? "Creating account…" : "Create account"}
         </button>
-        <p className="text-xs text-ink-700 text-center">
+        <p className="text-xs text-neo-smoke text-center">
           By continuing you agree to SyncDoc's Terms of Service and Privacy Policy.
         </p>
       </form>

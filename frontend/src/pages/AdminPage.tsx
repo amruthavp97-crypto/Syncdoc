@@ -60,7 +60,7 @@ export default function AdminPage() {
       <div className="glass-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-ink-500 border-b border-white/[0.06]">
+            <tr className="text-left text-ink-500 border-b border-black/[0.07]">
               <th className="px-5 py-3 font-medium">Name</th>
               <th className="px-5 py-3 font-medium">Email</th>
               <th className="px-5 py-3 font-medium">Role</th>
@@ -77,14 +77,14 @@ export default function AdminPage() {
               </tr>
             )}
             {usersData?.map((u) => (
-              <tr key={u._id} className="border-b border-white/[0.04] last:border-0">
+              <tr key={u._id} className="border-b border-black/[0.06] last:border-0">
                 <td className="px-5 py-3">{u.name}</td>
                 <td className="px-5 py-3 text-ink-500">{u.email}</td>
                 <td className="px-5 py-3">
                   <select
                     value={u.role}
                     onChange={(e) => updateRole.mutate({ id: u._id, role: e.target.value })}
-                    className="bg-white/[0.06] border border-white/[0.08] rounded-lg px-2 py-1 text-xs"
+                    className="bg-black/[0.045] border border-black/[0.08] rounded-lg px-2 py-1 text-xs"
                   >
                     <option value="admin">Admin</option>
                     <option value="editor">Editor</option>

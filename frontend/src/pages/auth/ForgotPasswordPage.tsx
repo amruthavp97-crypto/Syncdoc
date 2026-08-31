@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
       }
     >
       {sent ? (
-        <p className="text-sm text-ink-300">
+        <p className="text-sm text-neo-paper/80">
           If that email is registered, a reset link is on its way. Check your inbox.
         </p>
       ) : (
@@ -33,10 +33,10 @@ export default function ForgotPasswordPage() {
           <input
             type="email"
             placeholder="Email address"
-            className="input-field"
+            className="neo-input"
             {...register("email", { required: true })}
           />
-          <button type="submit" disabled={forgotPassword.isPending} className="btn-gradient w-full disabled:opacity-60">
+          <button type="submit" disabled={forgotPassword.isPending} className="neo-btn-primary w-full">
             {forgotPassword.isPending ? "Sending…" : "Send reset link"}
           </button>
         </form>

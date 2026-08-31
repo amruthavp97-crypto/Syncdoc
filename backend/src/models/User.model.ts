@@ -22,6 +22,9 @@ export interface IUser extends MongooseDocument {
   passwordResetToken?: string;
   passwordResetExpires?: Date;
   twoFactorEnabled: boolean;
+  preferences: {
+    emailNotifications: boolean;
+  };
   oauth: {
     googleId?: string;
     githubId?: string;
@@ -62,6 +65,9 @@ const UserSchema = new Schema<IUser>(
     passwordResetToken: { type: String, select: false },
     passwordResetExpires: { type: Date, select: false },
     twoFactorEnabled: { type: Boolean, default: false },
+    preferences: {
+      emailNotifications: { type: Boolean, default: true },
+    },
     oauth: {
       googleId: { type: String, index: true, sparse: true },
       githubId: { type: String, index: true, sparse: true },

@@ -49,8 +49,8 @@ export default function DashboardPage() {
       {
         label: "Documents created",
         data: analytics?.documentsCreatedByDay.map((d) => d.count) || [],
-        borderColor: "#7c5cff",
-        backgroundColor: "rgba(124,92,255,0.15)",
+        borderColor: "#1b4332",
+        backgroundColor: "rgba(27,67,50,0.12)",
         fill: true,
         tension: 0.4,
         pointRadius: 0,
@@ -90,8 +90,8 @@ export default function DashboardPage() {
               maintainAspectRatio: false,
               plugins: { legend: { display: false } },
               scales: {
-                x: { grid: { display: false }, ticks: { color: "#8b90ae" } },
-                y: { grid: { color: "rgba(255,255,255,0.05)" }, ticks: { color: "#8b90ae" } },
+                x: { grid: { display: false }, ticks: { color: "#6b7a6c" } },
+                y: { grid: { color: "rgba(43,51,40,0.06)" }, ticks: { color: "#6b7a6c" } },
               },
             }}
           />

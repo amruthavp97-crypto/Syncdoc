@@ -30,9 +30,9 @@ export default function VerifyEmailPage() {
         </Link>
       }
     >
-      {state === "pending" && <p className="text-sm text-ink-500">Hang tight, verifying your email…</p>}
+      {state === "pending" && <p className="text-sm text-neo-smoke">Hang tight, verifying your email…</p>}
       {state === "success" && (
-        <p className="text-sm text-ink-300">Your email has been verified. You can now sign in.</p>
+        <p className="text-sm text-neo-paper/80">Your email has been verified. You can now sign in.</p>
       )}
       {state === "error" && (
         <p className="text-sm text-accent-danger">

@@ -54,7 +54,7 @@ export default function ResetPasswordPage() {
           <input
             type="password"
             placeholder="New password"
-            className="input-field"
+            className="neo-input"
             {...register("password", { required: true, minLength: 8 })}
           />
           {errors.password && <p className="text-accent-danger text-xs mt-1">At least 8 characters</p>}
@@ -63,14 +63,14 @@ export default function ResetPasswordPage() {
           <input
             type="password"
             placeholder="Confirm new password"
-            className="input-field"
+            className="neo-input"
             {...register("confirmPassword", { validate: (v) => v === watch("password") || "Doesn't match" })}
           />
           {errors.confirmPassword && (
             <p className="text-accent-danger text-xs mt-1">{errors.confirmPassword.message}</p>
           )}
         </div>
-        <button type="submit" disabled={resetPassword.isPending} className="btn-gradient w-full disabled:opacity-60">
+        <button type="submit" disabled={resetPassword.isPending} className="neo-btn-primary w-full">
           {resetPassword.isPending ? "Resetting…" : "Reset password"}
         </button>
       </form>

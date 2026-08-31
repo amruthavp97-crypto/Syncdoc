@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { SyncDocument } from "../models/Document.model";
+import { User } from "../models/User.model";
 import { Workspace } from "../models/Workspace.model";
 import { Version } from "../models/Version.model";
 import { ActivityLog } from "../models/ActivityLog.model";
@@ -192,10 +193,20 @@ export const shareDocument = catchAsync(async (req: Request, res: Response) => {
   if (!doc) throw ApiError.notFound("Document not found");
   if (documentOwnerCheck(doc, req.user.id) === false) throw ApiError.forbidden();
 
-  const { userId, permission } = req.body as { userId: string; permission: string };
-  const existing = doc.permissions.find((p) => p.user.toString() === userId);
+  const { userId, email, permission } = req.body as { userId?: string; email?: string; permission: string };
+  let targetUserId = userId;
+
+  if (!targetUserId && email) {
+    const targetUser = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!targetUser) throw ApiError.notFound(`No user found with email ${email}`);
+    targetUserId = targetUser._id.toString();
+  }
+  if (!targetUserId) throw ApiError.badRequest("Provide either a userId or an email to share with");
+  if (targetUserId === doc.owner.toString()) throw ApiError.badRequest("Document owner already has full access");
+
+  const existing = doc.permissions.find((p) => p.user.toString() === targetUserId);
   if (existing) existing.permission = permission as never;
-  else doc.permissions.push({ user: userId as unknown as never, permission: permission as never });
+  else doc.permissions.push({ user: targetUserId as unknown as never, permission: permission as never });
 
   await doc.save();
   await ActivityLog.create({
@@ -203,7 +214,7 @@ export const shareDocument = catchAsync(async (req: Request, res: Response) => {
     action: "document.shared",
     workspace: doc.workspace,
     targetDocument: doc._id,
-    metadata: { userId, permission },
+    metadata: { targetUserId, permission },
   });
 
   res.json({ document: doc });

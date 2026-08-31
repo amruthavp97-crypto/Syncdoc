@@ -13,5 +13,6 @@ router.get("/:id", ws.getWorkspace);
 router.post("/:id/invite", validate(inviteMemberSchema), ws.inviteMember);
 router.post("/accept-invite", ws.acceptInvite);
 router.delete("/:id/members/:userId", ws.removeMember);
+router.delete("/:id", ws.deleteWorkspace);
 
 export default router;

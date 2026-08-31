@@ -47,17 +47,17 @@ export default function LoginPage() {
       }
     >
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <a href="/api/auth/google" className="btn-ghost flex items-center justify-center gap-2 text-sm">
+        <a href="/api/auth/google" className="neo-btn-ghost flex items-center justify-center gap-2 text-sm">
           <FaGoogle /> Google
         </a>
-        <a href="/api/auth/github" className="btn-ghost flex items-center justify-center gap-2 text-sm">
+        <a href="/api/auth/github" className="neo-btn-ghost flex items-center justify-center gap-2 text-sm">
           <FaGithub /> GitHub
         </a>
       </div>
       <div className="flex items-center gap-3 mb-6">
-        <div className="h-px flex-1 bg-white/[0.08]" />
-        <span className="text-xs text-ink-700">or continue with email</span>
-        <div className="h-px flex-1 bg-white/[0.08]" />
+        <div className="h-px flex-1 bg-black/[0.06]" />
+        <span className="text-xs text-neo-smoke">or continue with email</span>
+        <div className="h-px flex-1 bg-black/[0.06]" />
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
@@ -70,7 +70,7 @@ export default function LoginPage() {
           <input
             type="email"
             placeholder="Email address"
-            className="input-field"
+            className="neo-input"
             {...register("email", { required: "Email is required" })}
           />
           {errors.email && <p className="text-accent-danger text-xs mt-1">{errors.email.message}</p>}
@@ -79,21 +79,21 @@ export default function LoginPage() {
           <input
             type="password"
             placeholder="Password"
-            className="input-field"
+            className="neo-input"
             {...register("password", { required: "Password is required" })}
           />
           {errors.password && <p className="text-accent-danger text-xs mt-1">{errors.password.message}</p>}
         </div>
         <div className="flex items-center justify-between text-sm">
-          <label className="flex items-center gap-2 text-ink-500">
-            <input type="checkbox" className="accent-brand-violet" {...register("rememberMe")} />
+          <label className="flex items-center gap-2 text-neo-smoke">
+            <input type="checkbox" className="accent-brand-blue" {...register("rememberMe")} />
             Remember me
           </label>
           <Link to="/forgot-password" className="text-brand-blue hover:underline">
             Forgot password?
           </Link>
         </div>
-        <button type="submit" disabled={login.isPending} className="btn-gradient w-full disabled:opacity-60">
+        <button type="submit" disabled={login.isPending} className="neo-btn-primary w-full">
           {login.isPending ? "Signing in…" : "Sign in"}
         </button>
       </form>

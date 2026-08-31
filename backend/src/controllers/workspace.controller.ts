@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import crypto from "crypto";
 import { Workspace } from "../models/Workspace.model";
 import { User } from "../models/User.model";
+import { SyncDocument } from "../models/Document.model";
+import { Version } from "../models/Version.model";
+import { Folder } from "../models/Folder.model";
 import { ActivityLog } from "../models/ActivityLog.model";
 import { ApiError } from "../utils/ApiError";
 import { catchAsync } from "../utils/catchAsync";
@@ -126,4 +129,35 @@ export const removeMember = catchAsync(async (req: Request, res: Response) => {
   });
 
   res.json({ message: "Member removed.", workspace });
+});
+
+export const deleteWorkspace = catchAsync(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const workspace = await Workspace.findById(req.params.id);
+  if (!workspace) throw ApiError.notFound("Workspace not found");
+  if (workspace.owner.toString() !== req.user.id) {
+    throw ApiError.forbidden("Only the workspace owner can delete it");
+  }
+
+  // Cascade delete: a Document requires a workspace reference, so leaving
+  // orphaned documents behind would break every read of them. This is
+  // destructive and irreversible, which is why the frontend requires
+  // typing the workspace name to confirm before calling this.
+  const docsInWorkspace = await SyncDocument.find({ workspace: workspace._id }).select("_id");
+  const docIds = docsInWorkspace.map((d) => d._id);
+
+  await Promise.all([
+    SyncDocument.deleteMany({ workspace: workspace._id }),
+    Version.deleteMany({ document: { $in: docIds } }),
+    Folder.deleteMany({ workspace: workspace._id }),
+  ]);
+
+  await workspace.deleteOne();
+  await ActivityLog.create({
+    actor: req.user.id,
+    action: "workspace.deleted",
+    metadata: { workspaceId: workspace._id, name: workspace.name, documentsDeleted: docIds.length },
+  });
+
+  res.status(204).send();
 });

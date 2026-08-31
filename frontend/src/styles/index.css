@@ -2,56 +2,132 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Light theme (default) - warm beige surfaces, deep forest-green text.
+     Values are space-separated RGB triplets (no commas, no rgb()) so
+     Tailwind's `rgb(var(--x) / <alpha-value>)` pattern can apply opacity
+     modifiers like bg-base-900/50 on top of them. */
+  --c-base-950: 232 223 200;
+  --c-base-900: 243 237 224;
+  --c-base-850: 251 248 241;
+  --c-base-800: 233 224 204;
+  --c-base-700: 216 203 174;
+  --c-ink-100: 31 46 35;
+  --c-ink-300: 60 79 63;
+  --c-ink-500: 107 122 108;
+  --c-ink-700: 163 172 156;
+}
+
+.dark {
+  /* Dark theme - deep forest-green surfaces, warm beige text. Brand accent
+     and semantic colors (success/warning/danger) stay the same in both
+     modes by design; only surfaces and text invert. */
+  --c-base-950: 10 20 16;
+  --c-base-900: 15 31 24;
+  --c-base-850: 22 41 31;
+  --c-base-800: 28 50 38;
+  --c-base-700: 39 66 50;
+  --c-ink-100: 237 228 211;
+  --c-ink-300: 188 199 173;
+  --c-ink-500: 138 154 134;
+  --c-ink-700: 90 107 88;
+}
+
 @layer base {
   html {
     @apply scroll-smooth;
   }
   body {
-    @apply bg-base-900 text-ink-100 font-body antialiased;
+    @apply bg-base-900 text-ink-100 font-body antialiased transition-colors duration-300;
   }
   h1, h2, h3, h4 {
     @apply font-display;
   }
   ::selection {
-    @apply bg-brand-violet/40 text-white;
+    @apply bg-brand-violet/20 text-ink-100;
   }
 }
 
 @layer components {
+  /* Glassmorphism + claymorphism, blended: cards stay translucent and
+     blurred (glass) but pick up their depth from the dual soft shadow in
+     `shadow-glass` (clay) instead of a hard border - a puffy, "soft dough"
+     edge rather than a crisp glass rim. */
   .glass-card {
-    @apply bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-xl2 shadow-glass;
+    @apply bg-white/55 backdrop-blur-xl rounded-xl2 shadow-glass;
   }
   .glass-panel {
-    @apply bg-base-850/70 backdrop-blur-md border border-white/[0.06] rounded-xl2;
+    @apply bg-white/65 backdrop-blur-md rounded-xl2 shadow-glass;
   }
   .btn-gradient {
-    @apply bg-brand-gradient bg-[length:200%_200%] text-white font-semibold rounded-xl px-5 py-2.5
-      transition-all duration-300 hover:shadow-glow-violet hover:bg-[position:100%_0%];
+    @apply bg-brand-gradient bg-[length:200%_200%] text-white font-semibold rounded-full px-5 py-2.5
+      shadow-glow-violet transition-all duration-300 hover:bg-[position:100%_0%] active:scale-[0.98];
   }
   .btn-ghost {
-    @apply bg-white/[0.04] hover:bg-white/[0.08] text-ink-100 rounded-xl px-5 py-2.5 border border-white/[0.08]
-      transition-colors duration-200;
+    @apply bg-white/55 hover:bg-white/85 text-ink-100 rounded-full px-5 py-2.5 shadow-glass
+      transition-all duration-200 active:scale-[0.98];
   }
+  /* Claymorphism convention: buttons/cards read as raised (outward dual
+     shadow), inputs read as gently pressed into the surface (inset). */
   .input-field {
-    @apply bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-ink-100
-      placeholder:text-ink-700 outline-none focus:border-brand-violet/60 focus:ring-2 focus:ring-brand-violet/20
+    @apply bg-base-850/80 border-none rounded-2xl px-4 py-2.5 text-ink-100 shadow-clay-inset
+      placeholder:text-ink-700 outline-none focus:ring-2 focus:ring-brand-violet/15
       transition-all duration-200 w-full;
   }
   .stat-card {
-    @apply glass-card p-5 flex flex-col gap-2 hover:border-brand-violet/30 transition-colors duration-300;
+    @apply glass-card p-5 flex flex-col gap-2 hover:-translate-y-0.5 transition-transform duration-300;
   }
   .sidebar-link {
-    @apply flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-ink-500 hover:text-ink-100
-      hover:bg-white/[0.05] transition-colors duration-200 text-sm font-medium;
+    @apply flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-ink-500 hover:text-ink-100
+      hover:bg-black/[0.04] transition-colors duration-200 text-sm font-medium;
   }
   .sidebar-link.active {
-    @apply text-white bg-white/[0.08] shadow-inner;
+    @apply text-white bg-brand-gradient shadow-glow-violet;
+  }
+
+  /* --- Neo-Apple auth flow: glassy gradients, organic clay forms --- */
+  .neo-scene {
+    @apply min-h-screen bg-neo-void relative overflow-hidden flex items-center justify-center px-6 py-12;
+  }
+  .neo-blob-field {
+    @apply absolute inset-0 pointer-events-none;
+  }
+  .neo-blob {
+    @apply absolute rounded-full blur-3xl opacity-60;
+  }
+  .neo-card {
+    @apply relative bg-white/60 backdrop-blur-2xl rounded-squircle shadow-glass overflow-hidden;
+  }
+  /* Specular highlight - a thin bright line along the top edge, like light
+     catching the top of a curved glass surface. On a warm beige card this
+     reads as a soft cream "shine" against the slightly-deeper card tone. */
+  .neo-card::before {
+    content: "";
+    @apply absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent;
+  }
+  .neo-mark {
+    @apply w-11 h-11 rounded-2xl bg-brand-gradient grid place-items-center shadow-glow-ember
+      font-neo font-bold text-white;
+  }
+  .neo-input {
+    @apply bg-neo-charcoal/80 border-none rounded-2xl px-4 py-3 text-neo-paper text-sm shadow-clay-inset
+      placeholder:text-neo-smoke/70 outline-none focus:ring-2 focus:ring-neo-ember/15
+      transition-all duration-200 w-full;
+  }
+  .neo-btn-primary {
+    @apply bg-brand-gradient bg-[length:200%_200%] text-white font-neo font-semibold rounded-full px-5 py-3
+      shadow-glow-ember transition-all duration-300 hover:bg-[position:100%_0%] active:scale-[0.98]
+      disabled:opacity-60 disabled:shadow-none;
+  }
+  .neo-btn-ghost {
+    @apply bg-white/55 hover:bg-white/85 text-neo-paper rounded-full px-5 py-3 shadow-glass
+      transition-colors duration-200 font-neo text-sm font-medium;
   }
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+::-webkit-scrollbar-thumb { background: rgba(43,51,40,0.18); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(43,51,40,0.3); }
 ::-webkit-scrollbar-track { background: transparent; }
 
 /* TipTap editor content styling */
@@ -67,22 +143,22 @@
   height: 0;
 }
 .ProseMirror pre {
-  @apply bg-base-950 border border-white/[0.08] rounded-lg p-4 font-mono text-sm overflow-x-auto;
+  @apply bg-base-950 border border-black/[0.07] rounded-lg p-4 font-mono text-sm overflow-x-auto;
 }
 .ProseMirror code {
-  @apply font-mono text-brand-cyan bg-white/[0.06] px-1.5 py-0.5 rounded;
+  @apply font-mono text-ink-100 bg-black/[0.05] px-1.5 py-0.5 rounded;
 }
 .ProseMirror pre code {
   @apply bg-transparent p-0 text-ink-100;
 }
 .ProseMirror blockquote {
-  @apply border-l-2 border-brand-violet/60 pl-4 italic text-ink-300;
+  @apply border-l-2 border-brand-violet/50 pl-4 italic text-ink-300;
 }
 .ProseMirror table {
   @apply border-collapse w-full my-4;
 }
 .ProseMirror td, .ProseMirror th {
-  @apply border border-white/[0.1] px-3 py-2;
+  @apply border border-black/[0.08] px-3 py-2;
 }
 .ProseMirror img {
   @apply rounded-lg max-w-full my-3;
@@ -106,7 +182,7 @@
   font-family: "Inter", sans-serif;
   font-weight: 600;
   line-height: 1;
-  color: #0b0e1a;
+  color: #0a0908;
   white-space: nowrap;
   border-radius: 4px 4px 4px 0;
   padding: 2px 6px;

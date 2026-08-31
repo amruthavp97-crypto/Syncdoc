@@ -19,6 +19,15 @@ interface Room {
 
 const rooms = new Map<string, Room>();
 
+// Workspace presence: workspaceId -> userId -> count of open sockets for
+// that user in that workspace (a user can have multiple tabs open, so we
+// count sockets rather than treat any single disconnect as "went offline").
+const workspacePresence = new Map<string, Map<string, number>>();
+
+function workspaceOnlineUserIds(workspaceId: string): string[] {
+  return Array.from(workspacePresence.get(workspaceId)?.keys() ?? []);
+}
+
 async function persistRoom(documentId: string, room: Room) {
   // Only the raw CRDT update log is persisted here. The queryable JSON
   // snapshot (Document.content, used by dashboard/export/search) is
@@ -113,6 +122,27 @@ export function attachSocketServer(httpServer: HttpServer): SocketIOServer {
   io.on("connection", (socket: Socket) => {
     let joinedDocumentId: string | null = null;
     let clientId: number | null = null;
+    const joinedWorkspaceIds = new Set<string>();
+
+    socket.on("workspace:join", async ({ workspaceId }: { workspaceId: string }) => {
+      if (!workspaceId || joinedWorkspaceIds.has(workspaceId)) return;
+      joinedWorkspaceIds.add(workspaceId);
+      socket.join(`workspace:${workspaceId}`);
+
+      let members = workspacePresence.get(workspaceId);
+      if (!members) {
+        members = new Map();
+        workspacePresence.set(workspaceId, members);
+      }
+      members.set(socket.data.userId, (members.get(socket.data.userId) || 0) + 1);
+
+      const onlineUserIds = workspaceOnlineUserIds(workspaceId);
+      io.to(`workspace:${workspaceId}`).emit("workspace:presence", { workspaceId, onlineUserIds });
+    });
+
+    socket.on("workspace:leave", ({ workspaceId }: { workspaceId: string }) => {
+      leaveWorkspace(socket, workspaceId, joinedWorkspaceIds, io);
+    });
 
     socket.on("document:join", async ({ documentId, user }: { documentId: string; user: { name: string; color: string } }) => {
       joinedDocumentId = documentId;
@@ -162,6 +192,8 @@ export function attachSocketServer(httpServer: HttpServer): SocketIOServer {
     });
 
     socket.on("disconnect", async () => {
+      joinedWorkspaceIds.forEach((workspaceId) => leaveWorkspace(socket, workspaceId, joinedWorkspaceIds, io));
+
       if (!joinedDocumentId) return;
       const room = rooms.get(joinedDocumentId);
       if (!room) return;
@@ -175,4 +207,27 @@ export function attachSocketServer(httpServer: HttpServer): SocketIOServer {
   });
 
   return io;
+}
+
+function leaveWorkspace(
+  socket: Socket,
+  workspaceId: string,
+  joinedWorkspaceIds: Set<string>,
+  io: SocketIOServer
+) {
+  if (!joinedWorkspaceIds.has(workspaceId)) return;
+  joinedWorkspaceIds.delete(workspaceId);
+  socket.leave(`workspace:${workspaceId}`);
+
+  const members = workspacePresence.get(workspaceId);
+  if (!members) return;
+  const count = (members.get(socket.data.userId) || 1) - 1;
+  if (count <= 0) members.delete(socket.data.userId);
+  else members.set(socket.data.userId, count);
+  if (members.size === 0) workspacePresence.delete(workspaceId);
+
+  io.to(`workspace:${workspaceId}`).emit("workspace:presence", {
+    workspaceId,
+    onlineUserIds: workspaceOnlineUserIds(workspaceId),
+  });
 }
