@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery,useMutation } from "@tanstack/react-query";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -13,10 +13,9 @@ import { HiOutlineDocumentText, HiOutlineUserGroup, HiOutlineCircleStack } from 
 import { api } from "@/api/client";
 import StatCard from "@/components/ui/StatCard";
 import DocumentCard, { DocSummary } from "@/components/ui/DocumentCard";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
-
 interface DashboardSummary {
   cards: { documents: number; workspaces: number; storageUsedBytes: number };
   pinned: DocSummary[];
@@ -26,7 +25,6 @@ interface DashboardSummary {
 interface AnalyticsResponse {
   documentsCreatedByDay: { date: string; count: number }[];
 }
-
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -34,6 +32,23 @@ function formatBytes(bytes: number): string {
 }
 
 export default function DashboardPage() {
+const navigate = useNavigate();
+
+const createDocument = useMutation({
+  mutationFn: async () => {
+    const response = await api.post("/documents", {
+      title: "Untitled document",
+    });
+
+    return response.data.document;
+  },
+  onSuccess: (document) => {
+    navigate(`/documents/${document._id}`);
+  },
+});
+
+
+
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard-summary"],
     queryFn: async () => (await api.get<DashboardSummary>("/dashboard/summary")).data,
@@ -65,10 +80,14 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold font-display">Dashboard</h1>
           <p className="text-ink-500 text-sm mt-1">Welcome back — here's what's happening.</p>
         </div>
-        <Link to="/documents/new" className="btn-gradient text-sm">
-          + New document
-        </Link>
-      </div>
+        <button
+          onClick={() => createDocument.mutate()}
+          disabled={createDocument.isPending}
+          className="btn-gradient text-sm"
+>
+          {createDocument.isPending ? "Creating…" : "+ New document"}
+        </button>
+        </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard label="Documents" value={data?.cards.documents ?? "—"} icon={HiOutlineDocumentText} />
